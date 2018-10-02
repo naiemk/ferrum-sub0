@@ -6,6 +6,7 @@ import {AppState} from './AppState';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
 import {ActionTypes, addAction} from './components/redux/Actions';
+import {Page} from './components/Page';
 
 interface AppProps {
     name: string;
@@ -18,18 +19,24 @@ interface AppDispatch {
 class App extends React.Component<AppProps & AppDispatch> {
     render() {
         return (
-            <View style={styles.container}>
-                <FormattedMessage
-                    id='app.hello'
-                    description='Main hello message'
-                    values={{
-                        name: this.props.name
-                    }}
-                />
-                <Button onClick={this.props.onClick}>
-                    Start
-                </Button>
-            </View>
+            <Page
+                title = 'title'
+                headerLeft = 'Yo'
+                headerRight = 'Ho'
+            >
+                <View style={styles.container}>
+                    <FormattedMessage
+                        id='app.hello'
+                        description='Main hello message'
+                        values={{
+                            name: this.props.name
+                        }}
+                    />
+                    <Button onClick={this.props.onClick}>
+                        Start
+                    </Button>
+                </View>
+            </Page>
         );
     }
 }
