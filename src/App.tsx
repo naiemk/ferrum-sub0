@@ -1,12 +1,19 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {Button} from 'antd-mobile-rn';
+import {FormattedMessage} from 'react-intl';
 
 export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
+        <FormattedMessage
+            id='app.hello'
+            description='Main hello message'
+            values={{
+                name: 'Yo!'
+            }}
+        />
         <Button>
           Start
         </Button>
