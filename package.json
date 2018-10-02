@@ -21,6 +21,8 @@
     "buildAndStart": "yarn run build && yarn run watchAndStart "
   },
   "dependencies": {
+    "@types/react-native-drawer-layout": "^1.3.5",
+    "antd-mobile-rn": "^2.2.1",
     "expo": "^30.0.1",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
@@ -34,6 +36,6 @@
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.3",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.1"
+    "typescript": "2.8.1"
   }
 }
