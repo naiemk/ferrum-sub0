@@ -29,12 +29,16 @@ class App extends React.Component<AppProps & AppDispatch> {
     render() {
         if (1 === 1) {
             return (
-                <MainMenuPage />
+                <MainMenuPage
+                    address='0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06'
+                    onBackupPress={() => {console.log('yo'); }}
+                    onRestorePress={() => {console.log('yo'); }}
+                />
             );
         }
         if (1 === 1) {
             return (
-                <NextAndBackPage title= 'Select a PIN Code' onBack={() => {console.log('BACK');}} onNext={() => {}} showBack={true} showNext={true}>
+                <NextAndBackPage title= 'Select a PIN Code' onBack={() => {console.log('BACK'); }} onNext={() => { }} showBack={true} showNext={true}>
                     <PageContent width={250} height={150}>
                         <Text>
                             You entered a valid PIN code1. Thank you buddy!
