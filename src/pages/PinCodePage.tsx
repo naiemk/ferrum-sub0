@@ -1,6 +1,5 @@
 import React from 'react';
-import {Page} from '../components/Page';
-import {StyleSheet, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, StyleSheet, TextInput, View} from 'react-native';
 
 export interface PinCodeProps {
     pin: string;
@@ -10,7 +9,7 @@ export interface PinCodeDispatch {
     onSubmit: (pinCode: string) => void;
 }
 
-export class PinCodePage extends React.Component<PinCodeProps&PinCodeDispatch> {
+export class PinCode extends React.Component<PinCodeProps&PinCodeDispatch> {
     inputRef: TextInput | undefined = undefined;
 
     componentDidMount() {
@@ -19,22 +18,29 @@ export class PinCodePage extends React.Component<PinCodeProps&PinCodeDispatch> {
 
     render() {
         return (
-            <Page>
+            <View style={styles.container}>
                 <View style={styles.container}>
                     <TextInput
                         ref={el => this.inputRef = el!}
-                        placeholder= 'Enter Pin Code'
-                        keyboardType= 'number-pad'
+                        placeholder= 'Enter 8 digit Pin Code'
+                        keyboardType= 'numeric'
                         secureTextEntry={true}
                         onChangeText={this.props.onSubmit}
+                        value={this.props.pin}
+                        maxLength={8}
+                        style={{fontSize: 36}}
                     />
                 </View>
-                <View style={{flex: 3}}>
-                </View>
-            </Page>
+            </View>
         );
     }
 }
+
+export const PinCodePage: React.StatelessComponent<PinCodeProps&PinCodeDispatch> = props => (
+    <KeyboardAvoidingView style={{flex: 1}} behavior= 'padding' enabled>
+        <PinCode pin={props.pin} onSubmit={props.onSubmit}/>
+    </KeyboardAvoidingView>
+);
 
 const styles = StyleSheet.create({
     container: {

@@ -22,10 +22,8 @@ export const Page: React.StatelessComponent<PageProps> = props => {
                 </View>
             </View>
             <View style={styles.toolbarTitle}>
-                <View style={styles.pushBottom}>
-                    <Text style={[Colors.styles.ferrumTxt, {textAlign: 'center', fontWeight: 'bold'}]}>
-                        {props.title}
-                    </Text>
+                <View style={[styles.pushBottom, {alignItems: 'center'}]}>
+                    {props.title}
                 </View>
             </View>
             <View style={styles.toolbarButtonRight}>
@@ -52,7 +50,7 @@ export const Page: React.StatelessComponent<PageProps> = props => {
 const styles = StyleSheet.create({
     body: {
         flex: 1,
-        flexDirection: 'column',
+        flexDirection: 'column'
         // alignItems: 'center'
     },
     toolbar: {
@@ -62,7 +60,9 @@ const styles = StyleSheet.create({
         paddingRight: 8,
         flexDirection: 'row',
         height: 70,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.shadhowsLighter
     },
     footer: {
         flexDirection: 'row',

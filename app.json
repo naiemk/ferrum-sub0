@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "FerrumSub0",
-    "description": "This project is really great.",
+    "description": "The most secure cold wallet in the world.",
     "slug": "FerrumSub0",
     "privacy": "public",
     "sdkVersion": "30.0.0",
@@ -10,8 +10,8 @@
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./src/assets/sub0wallpaper.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "updates": {

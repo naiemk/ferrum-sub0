@@ -2,14 +2,16 @@ import React from 'react';
 import {Page} from '../components/Page';
 import {PageContent} from '../components/PageContent';
 import {Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity} from 'react-native';
-import {Button, Card, Flex, WhiteSpace, WingBlank} from 'antd-mobile-rn';
+import {Button, Flex, WhiteSpace} from 'antd-mobile-rn';
 import {FormattedMessage} from 'react-intl';
 import QRCode from 'react-native-qrcode';
 import {Colors} from '../assets/Colors';
-import burger from'../assets/burger-white.png';
+import burger from'../assets/burger.png';
 import backup from'../assets/backup.png';
 import restore from'../assets/restore.png';
 import { Col, Row, Grid } from 'react-native-easy-grid';
+import logo from '../assets/sub0-header.png';
+import {Panel} from '../components/Panel';
 
 export interface MainMenuPageProps {
     address: string;
@@ -18,6 +20,7 @@ export interface MainMenuPageProps {
 export interface MainMenuPageDispatch {
     onBackupPress: () => void;
     onRestorePress: () => void;
+    onStartPress: () => void;
 }
 
 export class MainMenuPage extends React.Component<MainMenuPageProps&MainMenuPageDispatch, {menu: boolean}> {
@@ -29,35 +32,31 @@ export class MainMenuPage extends React.Component<MainMenuPageProps&MainMenuPage
         const address1 = this.props.address.substring(0, 21);
         const address2 = this.props.address.substring(21);
         return (
-            <PageContent height={300} padding={8}>
-                <WingBlank size='lg'>
-                    <Card style={{minWidth: 250, padding: 16}}>
-                        <Card.Header title={<FormattedMessage id='app.youraddress' />} />
-                        <Card.Body style={{padding: 8, alignContent: 'center', justifyContent: 'center'}}>
-                            <Flex align='center' justify='around' >
-                                <QRCode
-                                    value={this.props.address}
-                                    size={180}
-                                    bgColor='black'
-                                    fgColor='white'/>
-                            </Flex>
-                            <WhiteSpace />
-
-                            <Card >
-                                <Card.Body style={{padding: 4, alignItems: 'center'}}>
-                                    <Text style={Colors.styles.monoTxt}>{address1}</Text>
-                                    <Text style={Colors.styles.monoTxt}>{address2}</Text>
-                                </Card.Body>
-                            </Card>
-
-                            <WhiteSpace />
-
-                            <WingBlank size='sm'>
-                                <Button type='primary' size='large'> <FormattedMessage id='btn.start'/> </Button>
-                            </WingBlank>
-                        </Card.Body>
-                    </Card>
-                </WingBlank>
+            <PageContent width={250} height={340} padding={8}>
+                <Panel style={{padding: 8}}>
+                    <Panel.Header style={{height: 40, alignContent: 'center', justifyContent: 'center'}}>
+                        <FormattedMessage id='app.youraddress' />
+                    </Panel.Header>
+                    <Panel.Body>
+                        <WhiteSpace />
+                        <Flex align='center' justify='around' >
+                            <QRCode
+                                value={this.props.address}
+                                size={180}
+                                bgColor='black'
+                                fgColor='white'/>
+                        </Flex>
+                        <WhiteSpace />
+                        <Panel style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <Text style={Colors.styles.monoTxt}>{address1}</Text>
+                            <Text style={Colors.styles.monoTxt}>{address2}</Text>
+                        </Panel>
+                        <WhiteSpace />
+                        <Panel.Footer>
+                            <Button type='primary' size='large' onClick={this.props.onStartPress}> <FormattedMessage id='btn.start'/> </Button>
+                        </Panel.Footer>
+                    </Panel.Body>
+                </Panel>
             </PageContent>
         );
     }
@@ -108,7 +107,7 @@ export class MainMenuPage extends React.Component<MainMenuPageProps&MainMenuPage
         return (
             <Page
                 showHeader={true}
-                title='Ferrum Sub Zero Wallet'
+                title={<Image source={logo} />}
                 headerRight={burgerMenu}
             >
                 {this.state.menu ? this.renderMenu() : this.renderAddress()}

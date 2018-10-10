@@ -2,8 +2,10 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
 export const PageContent: React.StatelessComponent<{padding?: number, width?: number | string, height?: number}> = props => (
-    <View style={[styles.container, {padding: props.padding || 50, width: props.width, height: props.height}]}>
-        {props.children}
+    <View style={[styles.container, {padding: props.padding || 50}]}>
+        <View style={{flex: 0, width: props.width, height: props.height}} >
+            {props.children}
+        </View>
     </View>
 );
 
