@@ -1,5 +1,5 @@
 import {AnyAction, combineReducers} from 'redux';
-import {MainPage, SetUp, UserInfo} from './AppState';
+import {MainPage, ReqData, Rpc, SetUp, UserInfo} from './AppState';
 import {ActionTypes} from './Actions';
 
 function mainPage(state: MainPage = {pageType: 'splash'}, action: AnyAction): MainPage {
@@ -35,7 +35,22 @@ function setup(state: SetUp = {}, action: AnyAction): SetUp {
 function userInfo(state: UserInfo = {}, action: AnyAction): UserInfo {
     switch (action.type) {
         case ActionTypes.SETUP_COMPLETE:
-            return { ...state, publicKey: '0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06'};
+            return { ...state, publicKey: '0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06', privateKey: '0xPPP'};
+        default:
+    }
+    return state;
+}
+
+function rpc(state: Rpc = { view: 'receive' }, action: AnyAction): Rpc {
+    switch (action.type) {
+        case ActionTypes.OPEN_RPC_SEND_PAGE:
+            return { ...state, view: 'send' };
+        case ActionTypes.OPEN_RPC_VALIDATE_PAGE:
+            return { ...state, view: 'validate' };
+        case ActionTypes.OPEN_RPC_SUCCESS_PAGE:
+            return { ...state, view: 'receive' };
+        case ActionTypes.RPC_DATA_READ:
+            return { ...state, requests: action.payload as ReqData[], view: 'success' };
         default:
     }
     return state;
@@ -44,6 +59,7 @@ function userInfo(state: UserInfo = {}, action: AnyAction): UserInfo {
 export const rootReducer = combineReducers({
     mainPage,
     setup,
-    userInfo
+    userInfo,
+    rpc
     }
 );

@@ -19,6 +19,9 @@ export namespace Messages {
             ' in the wallet',
         'app.selectPin': 'Select a PIN',
         'app.repeatPin': 'Repeat Your PIN',
+        'app.send': 'Scan this Code',
+        'app.sendDetails': 'This code represents the requests signed using your private key.' +
+            ' Use your Sub0 warm wallet to scan this code and complete your transaction',
 
         'btn.setup': 'Setup Me Up',
         'btn.previous': 'Back',

@@ -1,12 +1,14 @@
 import React from 'react';
 // @ts-ignore
 import {BarCodeScanner, Camera, Permissions} from 'expo';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, Text, TouchableOpacity, View} from 'react-native';
 import {FormattedText} from '../FormattedText';
 import camera from '../../assets/camera-white.png';
+import {ReqData} from '../../redux/AppState';
+import {Utils} from '../../utils/Utils';
 
 interface ReceiverProps {
-    onDataRead: (data: string) => void;
+    onDataRead: (data: ReqData[]) => void;
     width?: number;
     height?: number;
 }
@@ -68,7 +70,12 @@ export class Receiver extends React.Component<ReceiverProps, ReceiverState> {
                 const items = Array.from(this.state.messages).map(t => t.split('|', 2));
                 items.sort((a, b) => Number(a[0]) - Number(b[0]));
                 const fullText = items.map(t => t[1]).join('\n');
-                this.props.onDataRead(fullText);
+                const reqData = Utils.parseReq(fullText);
+                if (!reqData) {
+                    Alert.alert('Error', 'Received data cannot be parsed');
+                } else {
+                    this.props.onDataRead(reqData);
+                }
             }
         }
     }

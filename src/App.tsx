@@ -12,7 +12,7 @@ import {StartupPage} from './pages/StartupPage';
 import {Datastore} from './utils/Utils';
 import {SetupPin} from './pages/SetupPin';
 import {MainMenuPage} from './pages/MainMenuPage';
-import {RpcPage} from './pages/RpcPage';
+import {RpcContainer} from './pages/RpcPage';
 
 // @ts-ignore
 global.Intl = intl;
@@ -71,14 +71,7 @@ class App extends React.Component<AppProps & AppDispatch, {}> {
                     />
                 );
             case 'rpc':
-                return (
-                    <RpcPage
-                        step='receive'
-                        receiveCompleted={() => {}}
-                        onCloseClicked={() => this.props.onGoToMain(this.props.page)}
-                        successConfirmed={() => {}}
-                        requestApproved={() => {}}/>
-                );
+                return ( <RpcContainer /> );
             default:
                 return (<Text> Yo </Text>);
         }

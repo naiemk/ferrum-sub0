@@ -1,7 +1,7 @@
 import React from 'react';
 import {PageContent} from '../components/PageContent';
 import {ActionSheet, Badge, Flex, Modal, WhiteSpace} from 'antd-mobile-rn';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {FormattedMessage} from 'react-intl';
 import {Col, Grid} from 'react-native-easy-grid';
 import {Messages} from '../resources/Messages';
@@ -18,6 +18,12 @@ import {Sender} from '../components/qrcom/Sender';
 import cancel from '../assets/cancel.png';
 import next from '../assets/next.png';
 import logo from '../assets/sub0-header.png';
+import {AppState, ReqData, RpcView} from '../redux/AppState';
+import {Dispatch} from 'redux';
+import {ActionTypes, addAction} from '../redux/Actions';
+import {connect} from 'react-redux';
+import {getSignedReqData} from '../redux/Selectors';
+
 const alert = Modal.alert;
 
 interface BodyProps {
@@ -179,8 +185,6 @@ const RequestItem: React.StatelessComponent<{ item: ReqData, index: number, size
     );
 };
 
-type ReqData = TransactionRequestItem | SignableMessageItem;
-
 interface ValidateViewProps extends SubPageProps {
     requests: ReqData[];
 }
@@ -247,7 +251,7 @@ export class SendView extends React.Component<SendViewProps, {}> {
                 onNextClicked={this.props.onNext}
             >
             <View style={{width: 240, height: 180, flexDirection: 'column', alignItems: 'center'}}>
-                <Sender message={this.props.message} playing={true} size={220}/>
+                <Sender message={this.props.message} playing={true} size={170}/>
             </View>
             </Body>
         );
@@ -255,75 +259,99 @@ export class SendView extends React.Component<SendViewProps, {}> {
 }
 
 interface RequestViewProps extends SubPageProps {
+    onDataRead: (data: ReqData[]) => void;
+    reqDataIsRead: boolean;
 }
 
 export class ReceiveView extends React.Component<RequestViewProps, {}> {
-    onDataRead(data: string) {
-        console.log('Got data ', data);
+    componentDidMount() {
+        const dummyRequests = [
+            {
+                nonce: 1,
+                from: '0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06',
+                to: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
+                coinAddress: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
+                currency: 'ETH',
+                network: 'ETH',
+                amount: 4.44,
+                gasPrice: 0.01,
+                gasLimit: 3
+            },
+            { message: 'Hey Yo!' },
+            { message: 'Danke '},
+            { message: 'SIKTIR!!!'},
+            { message: 'Hey Yo!' },
+            { message: 'Danke '},
+            { message: 'SIKTIR!!!'},
+            { message: 'Hey Yo!' },
+            { message: 'Danke '},
+            { message: 'SIKTIR!!!'}
+        ];
+        setTimeout(() => this.props.onDataRead(dummyRequests), 3000);
     }
 
     render() {
+
         return (
             <Body
-                nextDisabled={true}
+                nextDisabled={!this.props.reqDataIsRead}
                 onCloseClicked={this.props.onClose}
                 titleId='app.requestTitle'
                 titleHelpId='app.requestTitleDetails'
                 onNextClicked={this.props.onNext}
             >
             <View style={{width: 240, height: 180, flexDirection: 'column', alignItems: 'center'}}>
-                <Receiver onDataRead={data => this.onDataRead(data)} width={220} height={150}/>
+                <Receiver onDataRead={data => this.props.onDataRead(data)} width={220} height={150}/>
             </View>
             </Body>
         );
     }
 }
 
-export interface RpcPageProps {
-    step: 'receive' | 'success' | 'send' | 'validate';
-    request?: string[];
-}
-
-export interface RpcPageDispatch {
-    receiveCompleted: (request: string) => void;
-    onCloseClicked: () => void;
-    successConfirmed: () => void;
-    requestApproved: () => void;
-}
-
-export class RpcPage extends React.Component<RpcPageProps&RpcPageDispatch, {}> {
+export class RpcPage extends React.Component<RpcProps&RpcDispatch, {}> {
+    constructor(props: RpcProps&RpcDispatch) {
+        super(props);
+        this.nextView = this.nextView.bind(this);
+        this.closeClicked = this.closeClicked.bind(this);
+    }
 
     nextView() {
-        console.log('next view');
+        this.props.onNext(this.props.view);
+    }
+
+    closeClicked() {
+        this.props.onClose(this.props.view);
+    }
+
+    renderReceive() {
+        switch (this.props.view) {
+            case 'receive':
+                return (
+                    <ReceiveView
+                        onDataRead={this.props.onDataRead}
+                        onClose={this.closeClicked}
+                        onNext={this.nextView}
+                        reqDataIsRead={this.props.requests !== undefined}
+                    />);
+            case 'success':
+                return ( <SuccessView onClose={this.closeClicked} onNext={this.nextView}/> );
+            case 'send':
+                return ( <SendView message={this.props.message!} onClose={this.closeClicked} onNext={this.nextView}/> );
+            case 'validate':
+                return ( <ValidateView requests={this.props.requests!} onClose={this.closeClicked} onNext={this.nextView}/> );
+            default:
+                return undefined;
+        }
     }
 
     render() {
-        // const dummyRequests = [
-        //     {
-        //         from: '0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06',
-        //         to: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
-        //         coinAddress: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
-        //         currency: 'ETH',
-        //         network: 'ETH',
-        //         amount: 4.44,
-        //         gas: 0.01
-        //     },
-        //     { message: 'Hey Yo!' },
-        //     { message: 'Danke '},
-        //     { message: 'SIKTIR!!!'},
-        //     { message: 'Hey Yo!' },
-        //     { message: 'Danke '},
-        //     { message: 'SIKTIR!!!'},
-        //     { message: 'Hey Yo!' },
-        //     { message: 'Danke '},
-        //     { message: 'SIKTIR!!!'}
-        // ];
+
         return (
             <Page
                 showHeader={true}
                 title={<Image source={logo} />}
             >
-                <ReceiveView onClose={this.props.onCloseClicked} onNext={() => this.nextView}/>
+                {this.renderReceive()}
             </Page>);
     }
 }
@@ -343,3 +371,65 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     }
 });
+
+interface RpcProps {
+    view: RpcView,
+    message?: string,
+    requests?: ReqData[]
+}
+
+interface RpcDispatch {
+    onNext: (v: RpcView) => void;
+    onClose: (v: RpcView) => void;
+    onDataRead: (d: ReqData[]) => void;
+}
+
+const mapStateToProps = (state: AppState): RpcProps => {
+    return {
+        view: state.rpc.view,
+        message: state.rpc.requests && state.rpc.view === 'send' ? getSignedReqData(state) : undefined,
+        requests: state.rpc.requests
+    };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch<RpcDispatch>): RpcDispatch => {
+    return {
+        onNext: (p: RpcView) => {
+            switch (p) {
+                case 'receive':
+                    dispatch(addAction(ActionTypes.OPEN_RPC_SUCCESS_PAGE, {}));
+                    break;
+                case 'success':
+                    dispatch(addAction(ActionTypes.OPEN_RPC_VALIDATE_PAGE, {}));
+                    break;
+                case 'validate':
+                    dispatch(addAction(ActionTypes.OPEN_RPC_SEND_PAGE, {}));
+                    break;
+                case 'send':
+                    Alert.alert('Transaction Completed!');
+                    dispatch(addAction(ActionTypes.OPEN_PUBLIC_ADDR_PAGE, {}));
+                    break;
+                default:
+            }
+        },
+        onClose: (p: RpcView) => {
+            switch (p) {
+                case 'receive':
+                case 'validate':
+                case 'success':
+                case 'send':
+                    dispatch(addAction(ActionTypes.OPEN_PUBLIC_ADDR_PAGE, {}));
+                    break;
+                default:
+            }
+        },
+        onDataRead: (d: ReqData[]) => {
+            dispatch(addAction(ActionTypes.RPC_DATA_READ, d));
+        }
+    };
+};
+
+export const RpcContainer = connect<RpcProps, RpcDispatch, {}, AppState> (
+    mapStateToProps,
+    mapDispatchToProps
+)(RpcPage);

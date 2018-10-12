@@ -1,8 +1,11 @@
 import CryptoJS from 'crypto-js';
 import { AsyncStorage } from 'react-native';
 import {SignableMessageItem, TransactionRequestItem} from '../components/redux/Types';
+import {ReqData} from '../redux/AppState';
+import {Buffer} from 'buffer';
 
 class EthereumTx {
+    public data: string = '';
     constructor(public parms: Object) {}
 
     sign(pKey: Buffer): void {
@@ -85,6 +88,30 @@ export namespace Utils {
         export function sign(privateKey: string, tx: EthereumTx): EthereumTx {
             tx.sign(new Buffer(privateKey));
             return tx;
+        }
+
+        export function signString(privateKey: string, data: string): string {
+            // TODO: Sign actually
+            return data + privateKey;
+        }
+
+        export function signReqData(privateKey: string, data: ReqData): string {
+            const message = data as  SignableMessageItem;
+            if (message.message) {
+                return signString(privateKey, message.message);
+            }
+
+            let tx = transactionFromRequest(data as TransactionRequestItem);
+            tx = sign(privateKey, tx);
+            return tx.data;
+        }
+    }
+
+    export function parseReq(json: string): ReqData[] | undefined {
+        try {
+            return JSON.parse(json);
+        } catch (e) {
+            return undefined;
         }
     }
 }
