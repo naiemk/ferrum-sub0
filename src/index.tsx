@@ -7,7 +7,7 @@ import {Messages} from './resources/Messages';
 import {Text} from 'react-native';
 import {Provider} from 'react-redux';
 // @ts-ignore
-import { Asset, AppLoading, SplashScreen } from 'expo';
+import { Linking, Asset, AppLoading, SplashScreen } from 'expo';
 
 import logger from 'redux-logger';
 import thunk from 'redux-thunk';
@@ -29,14 +29,29 @@ import {
     createStore,
     applyMiddleware
 } from 'redux';
-import {Datastore, Utils} from './utils/Utils';
+import {Datastore} from './utils/Utils';
 import {Loading} from './pages/loading';
 import {rootReducer} from './redux/Reducers';
+import {ActionTypes, addAction} from './redux/Actions';
 
 const middleware = applyMiddleware(thunk, logger);
 const store = createStore(rootReducer, middleware);
 
 addLocaleData([...en]);
+
+const _handleUrl = (url: {url: string}) => {
+    if (!url || !url.url) {
+        return;
+    }
+    let { path, queryParams } = Linking.parse(url.url);
+    console.log('Received a URL ', url);
+    if (path) {
+        store.dispatch(addAction(ActionTypes.OPEN_RPC_CLIENT_PAGE_SEND, { path: path, queryParams: queryParams }));
+        // Alert.alert(`Linked to app with path: ${path} and data: ${JSON.stringify(queryParams)}`);
+    }
+};
+
+Linking.addEventListener('url', _handleUrl);
 
 interface IndexState {
     isSplashReady: boolean,
@@ -66,8 +81,15 @@ export default class Index extends React.Component<{}, IndexState> {
         });
 
         await Promise.all(cacheImages);
+        const initUrl = await Linking.getInitialURL();
+        console.log('Opening with initial URL', initUrl);
+        if (initUrl) {
+            _handleUrl({url: initUrl});
+        }
+        // await Datastore.deleteaAll();
         await Datastore.loadAllAsync(); // Cache the data
-        await Utils.Crypto.sleep(1000);
+        const deepLink = Linking.makeUrl('sign/tx', { 'to': '0xc09ed68410ad6d989c5600342f9c011c5efafd11', amount: 0.01, currency: 'ETH' });
+        console.log('Linkonitto', deepLink);
         this.setState({ isAppReady: true });
     }
 

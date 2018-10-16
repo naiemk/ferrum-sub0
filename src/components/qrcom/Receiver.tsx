@@ -39,6 +39,7 @@ export class Receiver extends React.Component<ReceiverProps, ReceiverState> {
     }
 
     addBarcode(data: string) {
+        console.log('REeaderrrr', data);
         if (data.indexOf('|') > 0) {
             this.state.messages.add(data);
             this.checkIsDone();
@@ -59,17 +60,20 @@ export class Receiver extends React.Component<ReceiverProps, ReceiverState> {
 
     checkIsDone() {
         const msgs = Array.from(this.state.messages);
+        console.log('SIZE', this.state.messageSize, msgs.length)
         if (!this.state.messageSize) {
-            const last = msgs.find(m => m.indexOf('___END___') > 0);
+            const last = msgs.find(m => m.indexOf('___END___') >= 0);
             if (last) {
-                const size = Number(last.split('|')[0]);
+                const size = Number(last.split('|')[0]) + 1;
                 this.setState({...this.state, messageSize: size});
             }
         } else {
             if (this.state.messageSize === msgs.length) {
                 const items = Array.from(this.state.messages).map(t => t.split('|', 2));
                 items.sort((a, b) => Number(a[0]) - Number(b[0]));
-                const fullText = items.map(t => t[1]).join('\n');
+                console.log('ITEMS', items)
+                const fullText = items.map(t => t[1]).join('').replace('___END___', '');
+                console.log('Got full data', fullText);
                 const reqData = Utils.parseReq(fullText);
                 if (!reqData) {
                     Alert.alert('Error', 'Received data cannot be parsed');

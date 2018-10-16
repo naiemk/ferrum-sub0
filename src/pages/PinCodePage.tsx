@@ -36,11 +36,23 @@ export class PinCode extends React.Component<PinCodeProps&PinCodeDispatch> {
     }
 }
 
-export const PinCodePage: React.StatelessComponent<PinCodeProps&PinCodeDispatch> = props => (
-    <KeyboardAvoidingView style={{flex: 1}} behavior= 'padding' enabled>
-        <PinCode pin={props.pin} onSubmit={props.onSubmit}/>
-    </KeyboardAvoidingView>
-);
+export class PinCodePage extends React.Component<PinCodeDispatch, {pin: string}> {
+    state = {
+        pin: ''
+    };
+
+    render() {
+        if (this.state.pin.length === 8) {
+            setTimeout(() => this.props.onSubmit(this.state.pin), 100);
+        }
+
+        return (
+            <KeyboardAvoidingView style={{flex: 1}} behavior='padding' enabled>
+                <PinCode pin={this.state.pin} onSubmit={p => this.setState({pin: p})}/>
+            </KeyboardAvoidingView>
+        );
+    }
+}
 
 const styles = StyleSheet.create({
     container: {

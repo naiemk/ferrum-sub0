@@ -8,8 +8,7 @@ const getReqData = (state: AppState) => state.rpc.requests!;
 export const getSignedReqData = createSelector(
     [getPrivateKey, getReqData],
     (privateKey: string, data: ReqData[]) => {
-        console.log('STATO', privateKey, data)
         const signed = data.map((r: ReqData) => Utils.Crypto.signReqData(privateKey, r));
-        return signed.join('|');
+        return signed.join('_&_');
     }
 );

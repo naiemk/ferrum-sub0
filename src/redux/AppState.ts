@@ -1,8 +1,8 @@
 import {SignableMessageItem, TransactionRequestItem} from '../components/redux/Types';
 
-export type PageType = 'splash' | 'startup' | 'pin' | 'setupPin1' | 'setupPin2' | 'publicKey' | 'rpc';
+export type PageType = 'splash' | 'invalidPin' | 'startup' | 'pin' | 'setupPin1' | 'setupPin2' | 'publicKey' | 'rpc' | 'rpcClient';
 
-export type RpcView = 'receive' | 'success' | 'send' | 'validate';
+export type RpcView = 'receive' | 'success' | 'send' | 'validate' | 'info';
 
 export type ReqData = TransactionRequestItem | SignableMessageItem;
 
@@ -14,6 +14,7 @@ export interface UserInfo {
     privateKey?: string;
     publicKey?: string;
     pin?: string;
+    invalidPin: boolean;
 }
 
 export interface SetUp {
@@ -22,8 +23,14 @@ export interface SetUp {
 }
 
 export interface Rpc {
-    view: RpcView,
-    requests?: ReqData[]
+    view: RpcView;
+    requests?: ReqData[];
+}
+
+export interface RpcClient {
+    view: RpcView;
+    request?: ReqData;
+    returnUrl?: string;
 }
 
 export interface AppState {
@@ -31,4 +38,5 @@ export interface AppState {
     setup: SetUp,
     userInfo: UserInfo
     rpc: Rpc,
+    rpcClient: RpcClient,
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import {AppState, PageType} from './redux/AppState';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-
 // @ts-ignore
 import intl from 'intl';
 import {Text} from 'react-native';
@@ -13,6 +12,9 @@ import {Datastore} from './utils/Utils';
 import {SetupPin} from './pages/SetupPin';
 import {MainMenuPage} from './pages/MainMenuPage';
 import {RpcContainer} from './pages/RpcPage';
+import {PinCodePage} from './pages/PinCodePage';
+import {InvalidPinPage} from './pages/InvalidPin';
+import {RpcClientContainer} from './pages/RpcClientPage';
 
 // @ts-ignore
 global.Intl = intl;
@@ -32,6 +34,7 @@ interface AppDispatch {
 
     onPin1Change: (pin: string) => void;
     onPin2Change: (pin: string) => void;
+    onPinEntered: (pin: string) => void;
 }
 
 class App extends React.Component<AppProps & AppDispatch, {}> {
@@ -47,6 +50,10 @@ class App extends React.Component<AppProps & AppDispatch, {}> {
         switch (this.props.page) {
             case 'splash':
                 return <Loading onLoad={() => {}} />;
+            case 'pin':
+                return <PinCodePage onSubmit={p => { this.props.onPinEntered(p); }} />;
+            case 'invalidPin':
+                return <InvalidPinPage onNextPage={() => this.props.onNextPage(this.props.page) } />;
             case 'startup':
                 return <StartupPage onNextPage={this.props.onNextPage} />;
             case 'setupPin1':
@@ -72,6 +79,8 @@ class App extends React.Component<AppProps & AppDispatch, {}> {
                 );
             case 'rpc':
                 return ( <RpcContainer /> );
+            case 'rpcClient':
+                return ( <RpcClientContainer /> );
             default:
                 return (<Text> Yo </Text>);
         }
@@ -79,11 +88,16 @@ class App extends React.Component<AppProps & AppDispatch, {}> {
 }
 
 const mapStateToProps = (state: AppState) => {
+    // TODO: This should go to a middleware
+    const persistentData = Datastore.loadAll();
+    const showPin = persistentData && !state.userInfo.pin;
     return {
-        page: state.mainPage.pageType,
+        page: state.userInfo.invalidPin ?
+            'invalidPin' :
+            showPin && state.mainPage.pageType === 'splash' ? 'pin' : state.mainPage.pageType,
         pin1: state.setup.pinCode1,
         pin2: state.setup.pinCode2,
-        isSetup: (Datastore.loadAll() || {}).privateKey !== undefined,
+        isSetup: persistentData !== undefined,
         address: state.userInfo.publicKey
     };
 };
@@ -92,7 +106,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AppDispatch>) => {
     return {
         onNextPage: (p: PageType) => {
            switch (p) {
-               case 'splash':
+               case 'invalidPin':
                    dispatch(addAction(ActionTypes.OPEN_PIN_PAGE, {}));
                    break;
                case 'startup':
@@ -103,7 +117,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AppDispatch>) => {
                    break;
                case 'setupPin2':
                    dispatch(addAction(ActionTypes.OPEN_PUBLIC_ADDR_PAGE, {}));
-                   dispatch(addAction(ActionTypes.SETUP_COMPLETE, {}));
                    break;
                case 'publicKey':
                    dispatch(addAction(ActionTypes.OPEN_RPC_PAGE, {}));
@@ -130,7 +143,11 @@ const mapDispatchToProps = (dispatch: Dispatch<AppDispatch>) => {
             }
         },
         onPin1Change: (p: string) => dispatch(addAction(ActionTypes.SETUP_SET_PIN1, p)),
-        onPin2Change: (p: string) => dispatch(addAction(ActionTypes.SETUP_SET_PIN2, p))
+        onPin2Change: (p: string) => {
+            dispatch(addAction(ActionTypes.SETUP_SET_PIN2, p));
+            dispatch(addAction(ActionTypes.SETUP_COMPLETE, {}));
+        },
+        onPinEntered: (p: string) => dispatch(addAction(ActionTypes.PIN_ENTERED, p))
     } as AppDispatch;
 };
 

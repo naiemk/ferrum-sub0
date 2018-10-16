@@ -1,7 +1,7 @@
 import React from 'react';
 import {PageContent} from '../components/PageContent';
 import {ActionSheet, Badge, Flex, Modal, WhiteSpace} from 'antd-mobile-rn';
-import {Alert, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, StyleSheet, Text, TouchableOpacity, View, ViewStyle} from 'react-native';
 import {FormattedMessage} from 'react-intl';
 import {Col, Grid} from 'react-native-easy-grid';
 import {Messages} from '../resources/Messages';
@@ -32,9 +32,10 @@ interface BodyProps {
     nextDisabled: boolean;
     onCloseClicked: () => void;
     onNextClicked: () => void;
+    style?: ViewStyle;
 }
 
-class Body extends React.Component<BodyProps, {}> {
+export class Body extends React.Component<BodyProps, {}> {
     state = {
     };
 
@@ -72,7 +73,7 @@ class Body extends React.Component<BodyProps, {}> {
           </Grid>
         );
         return (
-            <PageContent height={270} width={250} padding={8}>
+            <PageContent height={270} width={250} padding={8} style={this.props.style}>
                 <Panel style={styles.card}>
                     <Panel.Header style={{height: 40}}>{cardTitle}</Panel.Header>
                     <Panel.Body style={styles.carBody}>
@@ -103,7 +104,7 @@ class Body extends React.Component<BodyProps, {}> {
     }
 }
 
-interface SubPageProps {
+export interface SubPageProps {
     onClose: () => void;
     onNext: () => void; }
 
@@ -238,17 +239,22 @@ export class ValidateView extends React.Component<ValidateViewProps, { allVisite
 
 interface SendViewProps extends SubPageProps {
     message: string;
+    titleId: string;
+    titleHelpId: string;
+    style?: ViewStyle;
 }
 
 export class SendView extends React.Component<SendViewProps, {}> {
     render() {
+        console.log('SENDING ', this.props.message);
         return (
             <Body
                 nextDisabled={false }
                 onCloseClicked={this.props.onClose}
-                titleId='app.send'
-                titleHelpId='app.sendDetails'
+                titleId={this.props.titleId}
+                titleHelpId={this.props.titleHelpId}
                 onNextClicked={this.props.onNext}
+                style={this.props.style}
             >
             <View style={{width: 240, height: 180, flexDirection: 'column', alignItems: 'center'}}>
                 <Sender message={this.props.message} playing={true} size={170}/>
@@ -261,6 +267,9 @@ export class SendView extends React.Component<SendViewProps, {}> {
 interface RequestViewProps extends SubPageProps {
     onDataRead: (data: ReqData[]) => void;
     reqDataIsRead: boolean;
+    style?: ViewStyle;
+    titleId: string;
+    titleHelpId: string;
 }
 
 export class ReceiveView extends React.Component<RequestViewProps, {}> {
@@ -269,13 +278,13 @@ export class ReceiveView extends React.Component<RequestViewProps, {}> {
             {
                 nonce: 1,
                 from: '0x1b0182339d88dec8ffe1855d7f4fba0ef5a20b06',
-                to: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
-                coinAddress: '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
+                to: '0xce0182339d88dec8ffe1855d7f4fba0ef5a20b06',
+                coinAddress: undefined, // '0xre0182339d88dec8ffe1855d7f4fba0ef5a20b06',
                 currency: 'ETH',
                 network: 'ETH',
-                amount: 4.44,
-                gasPrice: 0.01,
-                gasLimit: 3
+                amount: 4.44, // gasPrice=0.000000005&gasLimit=21000 (ed
+                gasPrice: 0.000000005,
+                gasLimit: 18000
             },
             { message: 'Hey Yo!' },
             { message: 'Danke '},
@@ -296,8 +305,8 @@ export class ReceiveView extends React.Component<RequestViewProps, {}> {
             <Body
                 nextDisabled={!this.props.reqDataIsRead}
                 onCloseClicked={this.props.onClose}
-                titleId='app.requestTitle'
-                titleHelpId='app.requestTitleDetails'
+                titleId={this.props.titleId}
+                titleHelpId={this.props.titleHelpId}
                 onNextClicked={this.props.onNext}
             >
             <View style={{width: 240, height: 180, flexDirection: 'column', alignItems: 'center'}}>
@@ -328,6 +337,8 @@ export class RpcPage extends React.Component<RpcProps&RpcDispatch, {}> {
             case 'receive':
                 return (
                     <ReceiveView
+                        titleId='app.requestTitle'
+                        titleHelpId='app.requestTitleDetails'
                         onDataRead={this.props.onDataRead}
                         onClose={this.closeClicked}
                         onNext={this.nextView}
@@ -336,7 +347,14 @@ export class RpcPage extends React.Component<RpcProps&RpcDispatch, {}> {
             case 'success':
                 return ( <SuccessView onClose={this.closeClicked} onNext={this.nextView}/> );
             case 'send':
-                return ( <SendView message={this.props.message!} onClose={this.closeClicked} onNext={this.nextView}/> );
+                return (
+                    <SendView
+                        titleId='app.send'
+                        titleHelpId='app.sendDetails'
+                        message={this.props.message!}
+                        onClose={this.closeClicked}
+                        onNext={this.nextView}/>
+                );
             case 'validate':
                 return ( <ValidateView requests={this.props.requests!} onClose={this.closeClicked} onNext={this.nextView}/> );
             default:
